@@ -26,7 +26,7 @@ class TradingEnv(gym.Env):
         # Không gian hành động (Mua, Bán, Giữ)
         self.action_space = spaces.Discrete(3)
         # Không gian quan sát với 11 chỉ báo kỹ thuật
-        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(11,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(12,), dtype=np.float32)
 
         # Cột quan sát
         self.obs_columns = ['Datetime_entry', "Mua/Ban", 'entry_price',
@@ -43,6 +43,8 @@ class TradingEnv(gym.Env):
             self.lot_size += 0.01
 
     def calculate_pip(self, entry_price, current_price):
+        entry_price = float(entry_price)
+        current_price = float(current_price)
         """Tính toán PIP cho mỗi giao dịch"""
         if self.position == 1:
             pip = (current_price - entry_price - self.spread) * 10
@@ -55,7 +57,7 @@ class TradingEnv(gym.Env):
         obs_entry_dict = {name: value for name, value in zip(self.obs_columns, self.obs_entry)}
 
         # Đường dẫn thư mục và file CSV
-        directory = r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\Trade_history_XAU_USD"
+        directory = r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\backtest"
         file_path = os.path.join(directory, 'trade_history_xau.csv')
 
         # Kiểm tra xem thư mục đã tồn tại chưa, nếu chưa thì tạo mới
@@ -86,19 +88,19 @@ class TradingEnv(gym.Env):
             self.entry_price=0      
         # Xử lý các hành động
 
-        if (self.position !=0  and  ( self.pip>=10 or self.pip<=-15 or done==True) ) :  # Đóng vị thế
+        if (self.position !=0  and  ( self.pip>=15 or self.pip<=-15 or done==True) ) :  # Đóng vị thế
            
             if self.pip < 0:
                 self.loss_streak += 1  # Tăng chuỗi thua lỗ
                 self.win_streak = 0  # Reset chuỗi thắng    
-                reward-=0.05*2
+                reward-=1.5
                 self.win=-1
-                profit=-2
+                profit=-15
             elif self.pip>0:
                 self.win_streak += 1  # Tăng chuỗi thắng
                 self.loss_streak = 0  # Reset chuỗi thua l
-                profit=1
-                reward+=0.05
+                profit=10
+                reward+=1.5
                 self.win=1
             if self.obs_entry is not None:
                self.obs_entry=np.append(self.obs_entry,self.lot_size)
@@ -138,32 +140,46 @@ class TradingEnv(gym.Env):
             self.obs_entry=np.append(self.obs_entry,self._next_observation())
         elif(action==2 and self.position==0):
             self.dem+=1
-        if(self.dem>=5): reward-=0.5
-        return self._next_observation(), reward, done, truncated, {}
+            reward-=1
+        
+        elif(action==2 and self.position!=0):
+            reward+=0.01
+        
+        
+        
+        # if((action==0 and self.position==-1 ) or (action==1 and self.position==1) ):
+        #     reward-=1
+        return self._next_observation(), reward, done, truncated, {'profit':profit}
 
     def _next_observation(self):
-        """Lấy quan sát tiếp theo từ dữ liệu"""
-        current_step_data = self.data.iloc[self.current_step]
-        observation = np.array([
-            current_step_data['ema10'],
-            current_step_data['ema20'],
-            current_step_data['ema50'],
-            current_step_data['rsi'],
-            current_step_data['macd'],
-            current_step_data['macd_signal'],
-            current_step_data['macd_hist'],
-            current_step_data['volume'],
-            current_step_data['ADX'],
-            current_step_data['c_DI'],
-            current_step_data['t_DI']
-        ])
+        # Giả sử các yếu tố trong observation là các chỉ báo kỹ thuật
+        observation = np.array([])
 
-        # Kiểm tra NaN trong quan sát và xử lý
-        if np.any(np.isnan(observation)):
-            print("Warning: NaN detected in observation:", observation)
-            observation = np.zeros_like(observation)
+        # Tính các chỉ báo từ dữ liệu và thêm vào observation
+        # Thí dụ:
+        observation = np.append(observation, self.data.iloc[self.current_step]['ema10'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['ema20'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['ema50'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['rsi'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['macd'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['macd_signal'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['macd_hist'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['volume'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['ADX'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['c_DI'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['t_DI'])
+        observation = np.append(observation, self.data.iloc[self.current_step]['close'])
 
+        # Đảm bảo tất cả các giá trị trong observation đều là số thực
+        observation = observation.astype(np.float32)
+
+        # Kiểm tra NaN hoặc vô cùng trong observation
+        if np.any(np.isnan(observation)) or np.any(np.isinf(observation)):
+            print("Warning: NaN or Inf values found in observation")
+            # Nếu có NaN hoặc Inf, có thể thay thế bằng giá trị mặc định (ví dụ: 0)
+            observation = np.nan_to_num(observation, nan=0.0, posinf=0.0, neginf=0.0)
         return observation
+
 
     def reset(self, seed=None):
         """Đặt lại môi trường về trạng thái ban đầu"""

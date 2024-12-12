@@ -7,6 +7,18 @@ from ta.trend import EMAIndicator, MACD, ADXIndicator
 import numpy as np
 from datetime import datetime, timedelta
 import os
+from stable_baselines3.common.vec_env import DummyVecEnv
+from environment import TradingEnv
+import logging
+import logging.config
+import yaml
+
+# Load logging configuration
+with open("config/logging.yaml", "r") as file:
+    logging_config = yaml.safe_load(file)
+    logging.config.dictConfig(logging_config)
+
+logger = logging.getLogger("live_trade")
 
 # Khởi động MT5
 if not mt5.initialize():
@@ -21,7 +33,7 @@ class LiveTradeMT5:
         self.pip=0
         self.loss_streak=0
         self.win_streak=0
-        self.tp=10
+        self.tp=15
         self.sl=15
         self.spread=0
         self.balance=balance
@@ -37,6 +49,11 @@ class LiveTradeMT5:
         'volume', 'adx','c_DI','t_DI','Lot','Profit','win'
     ]
         self.obs_entry = None
+        self.model_path=r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\models\ppo_trading_xauusd.zip"
+        self.observation_buffer = []
+        logger.info(f"Initialized LiveTradeMT5 for symbol: {symbol}")
+        logger.info(f"Fetched account balance: {balance}")
+
 
     @staticmethod
     def get_balance():
@@ -62,7 +79,8 @@ class LiveTradeMT5:
     def get_historical_data(symbol):
         candles = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, 0, 100)  # Lấy 100 nến để tính các chỉ báo
         if candles is None or len(candles) == 0:
-            print("Lỗi khi lấy dữ liệu nến.")
+            
+            logger.error(f"Failed to fetch historical data for {symbol}")
             return None
         df = pd.DataFrame(candles)
         return df
@@ -71,7 +89,7 @@ class LiveTradeMT5:
     def get_current_price(symbol):
         tick = mt5.symbol_info_tick(symbol)
         if tick is None:
-            print("Lỗi khi lấy giá hiện tại.")
+            logger.error(f"Failed to fetch current price for {symbol}")
             return None
         return tick.bid
     
@@ -136,19 +154,20 @@ class LiveTradeMT5:
 
         # Ghi vào file CSV, nếu file đã tồn tại thì chỉ thêm dữ liệu, không ghi lại header
         df.to_csv(file_path, mode='a', header=not file_exists, index=False)
+        logger.info(f"Saved trade history to {file_path}")
 
     def get_most_recent_deal(self,symbol):
         # Thời gian hiện tại và khoảng thời gian lấy dữ liệu
         to_date = datetime.now()
-        from_date = to_date - timedelta(seconds=10)
+        from_date = to_date - timedelta(seconds=3)
 
 
         # Lấy lịch sử giao dịch trong khoảng thời gian đã chỉ định
         deals = mt5.history_deals_get(from_date, to_date)
 
         if deals is None or len(deals) == 0:
-            print(f"No deals found in the last {20} seconds.")
-            return None
+            print(f"No deals found in the last {3} seconds.")
+            return 0
 
         # Lọc giao dịch theo symbol cụ thể
         symbol_deals = [deal for deal in deals if deal.symbol == symbol]
@@ -158,10 +177,10 @@ class LiveTradeMT5:
             recent_deal = max(symbol_deals, key=lambda d: d.time)
             print(f"Most recent deal for {symbol}:")
             print(f"usd: {recent_deal.profit}, Time: {datetime.fromtimestamp(recent_deal.time)}, Type: {recent_deal.type}, Volume: {recent_deal.volume}, Price: {recent_deal.price}")
-            return recent_deal.profit/(self.lot_size*10)
+            return recent_deal.profit/(self.lot_size*3)
             
         else:
-            print(f"No deals found for symbol {symbol} in the  {20} seconds.")
+            print(f"No deals found for symbol {symbol} in the  {10} seconds.")
             return 0
 
 
@@ -189,7 +208,7 @@ class LiveTradeMT5:
             fibonacci_levels = self.calculate_fibonacci(high, low)
             observation = np.append(observation, [
                 indicators['EMA10'], indicators['EMA20'],indicators["EMA50"],indicators['RSI'], indicators['MACD']['value'], indicators['MACD']['signal'],
-                indicators['MACD']['histogram'],df['tick_volume'].iloc[-1], indicators['ADX'],indicators["+DI"],indicators["-DI"]
+                indicators['MACD']['histogram'],df['tick_volume'].iloc[-1], indicators['ADX'],indicators["+DI"],indicators["-DI"],current_price
             ])
             
            
@@ -205,12 +224,14 @@ class LiveTradeMT5:
             self.spread=tick.bid-tick.ask
             self.entry_price=tick.ask
             self.position=1
+            logger.info(f"Placing buy order for {self.symbol} at price: {self.entry_price}")
             vi_the="Mua"
         elif action == 1 :  # Bán
             order_type = mt5.ORDER_TYPE_SELL
             self.spread=tick.bid-tick.ask
             self.entry_price=tick.bid
             self.position=-1
+            logger.info(f"Placing sell order for {self.symbol} at price: {self.entry_price}")
             vi_the="Ban"
         self.obs_entry=np.append(self.obs_entry,vi_the)
         self.obs_entry=np.append(self.obs_entry,self.entry_price)
@@ -249,7 +270,7 @@ class LiveTradeMT5:
         }
         result = mt5.order_send(request)
         if result.retcode != mt5.TRADE_RETCODE_DONE:
-            print(f"Lỗi khi đặt lệnh: {result.retcode}")
+            logger.error(f"Failed to place order. Error code: {result.retcode}")
 
     def close_order(self):
         positions = mt5.positions_get(symbol=self.symbol)
@@ -271,8 +292,25 @@ class LiveTradeMT5:
             result = mt5.order_send(request)
             if result.retcode != mt5.TRADE_RETCODE_DONE:
                 print(f"Lỗi khi đóng lệnh: {result.retcode}")
-        time.sleep(3)
+        feature_columns = [
+            "ema10", "ema20", "ema50", "rsi",
+            "macd", "macd_signal", "macd_hist",
+            "volume", "ADX", "c_DI", "t_DI","close","datetime"
+        ]
         self.pip=self.get_most_recent_deal(self.symbol)
+        buffer_df = pd.DataFrame(self.observation_buffer, columns=feature_columns)
+        # Tạo môi trường với buffer để huấn luyện lại mô hình
+        env = DummyVecEnv([lambda: TradingEnv(buffer_df)])
+        self.model.set_env(env)
+
+        # Huấn luyện lại mô hình
+        self.model.learn(total_timesteps=len(self.observation_buffer))
+        self.model.save(self.model_path)
+        self.model = PPO.load(self.model_path)
+
+        # Xóa buffer sau khi cập nhật
+        self.observation_buffer = []
+        
         profit=0
         if self.pip < -10: 
             self.win=-1        
@@ -310,8 +348,14 @@ class LiveTradeMT5:
 
     def run(self):
         tick = mt5.symbol_info_tick(self.symbol)
+        logger.info(f"Starting live trading for {self.symbol}")
         while self.equity!=0 or (positions !=0 and self.is_runBot())!=0 :
+            current_datetime=datetime.now()
+            formatted_time = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
             obs, _ = self.update_real_time_indicators()
+            obs_tmp=np.append(obs,formatted_time)
+            self.observation_buffer.append(obs_tmp)
+            self.model = PPO.load(self.model_path)
             action, _ = self.model.predict(obs)
             print(f'lot_size={self.lot_size}')
             print(action)
@@ -330,7 +374,7 @@ class LiveTradeMT5:
             if(self.position!=0):
                 self.pip=self.calculate_pip(self.entry_price,self.current_price)
                 print(f'pip={self.pip}')        
-            if  (self.position !=0  and  (self.pip>=10 or self.pip<=-15 or self.pip==0)   )  :  # Đóng lệnh         
+            if  (self.position !=0  and  self.get_most_recent_deal(self.symbol)!=0   )  :  # Đóng lệnh         
                  if self.pip < 0:
                     self.loss_streak += 1  # Tăng chuỗi thua lỗ
                     self.win_streak = 0  # Reset chuỗi thắng
@@ -349,8 +393,6 @@ class LiveTradeMT5:
             else:
                 positions = mt5.positions_get(symbol=self.symbol)
                 if not positions and self.position==0:
-                    current_datetime=datetime.now()
-                    formatted_time = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
                     self.obs_entry=np.array([])
                     self.obs_entry=np.append(self.obs_entry,formatted_time)
                     self.place_order(action,obs)
@@ -358,41 +400,41 @@ class LiveTradeMT5:
             time.sleep(1)
         return 0
 
-# # Tải mô hình PPO đã huấn luyện
-# account_info = mt5.account_info()
+# Tải mô hình PPO đã huấn luyện
+account_info = mt5.account_info()
 
-# def get_balance():
-#         account_info = mt5.account_info()
-#         if account_info is None:
-#             print("Lỗi khi lấy thông tin tài khoản.")
-#             return None
-#         return account_info.balance
-# balance=get_balance()
-# leverage=account_info.leverage
-# model = PPO.load("ppo_trading_xauusd.zip")
+def get_balance():
+        account_info = mt5.account_info()
+        if account_info is None:
+            print("Lỗi khi lấy thông tin tài khoản.")
+            return None
+        return account_info.balance
+balance=get_balance()
+leverage=account_info.leverage
+model = PPO.load(r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\models\ppo_trading_xauusd.zip")
 
-# # Khởi tạo live trade
-# live_trader = LiveTradeMT5(model,"XAUUSDm",balance,0.01,leverage)
-# live_trader2=LiveTradeMT5(model,"BTCUSDm",balance,0.01,400)
-# import threading
+# Khởi tạo live trade
+live_trader = LiveTradeMT5(model,"XAUUSDm",balance,0.01,leverage)
+live_trader2=LiveTradeMT5(model,"BTCUSDm",balance,0.01,400)
+import threading
 
-# # Giả sử bạn đã khởi tạo các đối tượng live_trader và live_trader2
+# Giả sử bạn đã khởi tạo các đối tượng live_trader và live_trader2
 
-# # Tạo các hàm để chạy từng live trader
-# def run_live_trader1():
-#     live_trader.run()
+# Tạo các hàm để chạy từng live trader
+def run_live_trader1():
+    live_trader.run()
 
-# def run_live_trader2():
-#     live_trader2.run()
+def run_live_trader2():
+    live_trader2.run()
 
-# # Tạo và khởi động các luồng
-# thread1 = threading.Thread(target=run_live_trader1)
-# thread2 = threading.Thread(target=run_live_trader2)
+# Tạo và khởi động các luồng
+thread1 = threading.Thread(target=run_live_trader1)
+thread2 = threading.Thread(target=run_live_trader2)
 
-# # Bắt đầu các luồng
-# thread1.start()
-# thread2.start()
+# Bắt đầu các luồng
+thread1.start()
+thread2.start()
 
-# # Tùy chọn: Đợi cho đến khi các luồng hoàn thành
-# thread1.join()
-# thread2.join()
+# Tùy chọn: Đợi cho đến khi các luồng hoàn thành
+thread1.join()
+thread2.join()

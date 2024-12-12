@@ -1,0 +1,6 @@
+2024-12-12 17:13:42,383 - training - INFO - Starting model training process.
+2024-12-12 17:13:42,383 - training - INFO - No pre-trained model found. Initializing new model.
+2024-12-12 17:13:43,454 - training - INFO - Loading data from C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-12 17:13:43,600 - training - INFO - Training on data with 95 timesteps.
+2024-12-12 17:13:47,921 - training - INFO - Training completed on C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-12 17:13:47,956 - training - INFO - Model saved at C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\models\ppo_trading_xauusd.zip

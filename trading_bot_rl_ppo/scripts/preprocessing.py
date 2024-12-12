@@ -6,8 +6,8 @@ import numpy as np
 
 def add_column_names_and_save():
     """Thêm tên cột và xử lý dữ liệu."""
-    for year in range(2015, 2025):
-        for month in range(1, 13):
+    for year in range(2015, 2016):
+        for month in range(1, 2):
             # Xác định đường dẫn file từ thư mục mới
             if month < 10:
                 absolute_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_0{month}.csv"
@@ -99,8 +99,8 @@ def combined_trend(data):
 
 def preprocess_data():
     """Tiền xử lý và lưu trữ các dữ liệu đã được xử lý với các chỉ báo"""
-    for year in range(2015, 2025):
-        for month in range(1, 13):
+    for year in range(2015, 2026):
+        for month in range(1, 2 ):
             # Đường dẫn file và file đầu ra
             if month < 10:
                 absolute_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_0{month}.csv"        
@@ -240,6 +240,4 @@ def preprocess_data():
             else:
                 print(f"File không tồn tại: {absolute_path}")
 
-if __name__ == "__main__":
-    add_column_names_and_save()
-    preprocess_data()
+

@@ -1,0 +1,26 @@
+2024-12-12 15:42:35,153 - live_trade - INFO - Initialized LiveTradeMT5 for symbol: XAUUSDm
+2024-12-12 15:42:35,153 - live_trade - INFO - Fetched account balance: 393.37
+2024-12-12 15:42:35,153 - live_trade - INFO - Initialized LiveTradeMT5 for symbol: BTCUSDm
+2024-12-12 15:42:35,153 - live_trade - INFO - Fetched account balance: 393.37
+2024-12-12 15:42:35,153 - live_trade - INFO - Starting live trading for XAUUSDm
+2024-12-12 15:42:35,184 - live_trade - INFO - Starting live trading for BTCUSDm
+2024-12-12 15:42:35,278 - live_trade - INFO - Placing buy order for XAUUSDm at price: 2716.125
+2024-12-12 15:42:35,278 - live_trade - INFO - Placing sell order for BTCUSDm at price: 100885.4
+2024-12-12 15:48:57,682 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_btc.csv
+2024-12-12 15:48:58,694 - live_trade - INFO - Placing sell order for BTCUSDm at price: 101016.09
+2024-12-12 15:56:56,760 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_xau.csv
+2024-12-12 15:56:57,784 - live_trade - INFO - Placing buy order for XAUUSDm at price: 2718.229
+2024-12-12 16:05:30,743 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_xau.csv
+2024-12-12 16:05:31,773 - live_trade - INFO - Placing sell order for XAUUSDm at price: 2717.054
+2024-12-12 16:08:07,130 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_xau.csv
+2024-12-12 16:08:08,139 - live_trade - INFO - Placing sell order for XAUUSDm at price: 2715.362
+2024-12-12 16:18:24,381 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_xau.csv
+2024-12-12 16:18:25,396 - live_trade - INFO - Placing sell order for XAUUSDm at price: 2717.14
+2024-12-12 16:25:05,049 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_xau.csv
+2024-12-12 16:25:06,071 - live_trade - INFO - Placing sell order for XAUUSDm at price: 2715.066
+2024-12-12 16:30:24,459 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_xau.csv
+2024-12-12 16:30:25,478 - live_trade - INFO - Placing sell order for XAUUSDm at price: 2716.28
+2024-12-12 16:36:56,964 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_btc.csv
+2024-12-12 16:36:57,978 - live_trade - INFO - Placing buy order for BTCUSDm at price: 100853.72
+2024-12-12 16:39:37,894 - live_trade - INFO - Saved trade history to C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time\trade_history_xau.csv
+2024-12-12 16:39:38,907 - live_trade - INFO - Placing sell order for XAUUSDm at price: 2715.133
