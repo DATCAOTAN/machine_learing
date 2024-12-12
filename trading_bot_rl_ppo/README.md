@@ -15,7 +15,7 @@ trading_bot_rl_ppo/
 ├── data/
 │   ├── raw/                    # Dữ liệu thô
 │   ├── processed/              # Dữ liệu đã qua xử lý
-│   └── README.md               # Thông tin về dữ liệu
+│   
 │
 ├── models/                     # Mô hình đã huấn luyện
 │   └── ppo_trading_xauusd.zip  # Mô hình PPO đã huấn luyện
@@ -31,16 +31,19 @@ trading_bot_rl_ppo/
 │   ├── model.py                # Huấn luyện và tối ưu siêu tham số cho PPO
 │   ├── live_trading.py         # Giao dịch trực tiếp với mô hình PPO
 │   ├── model_inference.py      # Inference với mô hình đã huấn luyện
-│   └── README.md               # Hướng dẫn sử dụng cho các script
-│
-├── notebooks/                  # Jupyter notebooks cho các thí nghiệm
-│   ├── 01-train-model.ipynb    # Huấn luyện mô hình
-│   ├── 02-optimize-ppo.ipynb   # Tối ưu siêu tham số
-│   └── 03-live-trade.ipynb     # Giao dịch trực tiếp với mô hình
+│   
+├──notebooks/                       # Notebooks để phân tích và thử nghiệm
+│   ├── exploratory/                 # Khám phá dữ liệu
+│   │   └── feature_engineering.ipynb # Tạo và phân tích các đặc trưng kỹ thuật
+│   ├── modeling/                    # Huấn luyện mô hình
+│   │   ├── model_training.ipynb     # Huấn luyện mô hình PPO
+│   │   └── model_evaluation.ipynb   # Đánh giá mô hình PPO
+│   └── inference/                   # Dự đoán và triển khai mô hình
+│       └── model_inference.ipynb    # Dự đoán các quyết định giao dịch   
+│       
 │
 ├── requirements.txt            # Các thư viện Python yêu cầu
 ├── README.md                   # Tổng quan về dự án và hướng dẫn cài đặt
-└── main.py                     # Script để chạy toàn bộ quy trình
 ```
 
 ## Cài đặt
@@ -48,7 +51,7 @@ trading_bot_rl_ppo/
 ### Bước 1: Clone dự án về máy
 
 ```bash
-git clone https://github.com/yourusername/trading_bot_rl_ppo.git
+git clone https://github.com/DATCAOTAN/machine_learing
 cd trading_bot_rl_ppo
 ```
 
