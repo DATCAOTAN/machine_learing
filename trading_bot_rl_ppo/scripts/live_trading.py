@@ -46,10 +46,10 @@ class LiveTradeMT5:
         self.is_close=0
         self.obs_columns = ['Datetime_entry','Mua/Ban','entry_price',
         'ema10', 'ema20', 'ema50', 'rsi', 'macd_value', 'macd_signal', 'macd_hist',
-        'volume', 'adx','c_DI','t_DI','Lot','Profit','win'
+        'volume', 'adx','c_DI','t_DI','close','Lot','Profit','win'
     ]
         self.obs_entry = None
-        self.model_path=r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\models\ppo_trading_xauusd.zip"
+        self.model_path=r"models\ppo_trading_xauusd.zip"
         self.observation_buffer = []
         logger.info(f"Initialized LiveTradeMT5 for symbol: {symbol}")
         logger.info(f"Fetched account balance: {balance}")
@@ -132,13 +132,22 @@ class LiveTradeMT5:
         obs_entry_dict = {name: value for name, value in zip(self.obs_columns, self.obs_entry)}
         
         # Đường dẫn thư mục và file CSV
-        directory = r'C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\trade_history\real_time'
+        current_working_dir = os.getcwd()
+        index = current_working_dir.find("trading_bot_rl_ppo")
+
+        # Cắt chuỗi đến vị trí kết thúc của "trading_bot_rl_ppo"
+        if index != -1:
+            base_path = current_working_dir[:index + len("trading_bot_rl_ppo")]
+        else:
+            base_path = current_working_dir  # Nếu không tìm thấy, giữ nguyên
+
+        directory = r'results\trade_history\real_time'
         if self.symbol == "XAUUSDm":
-            file_path = os.path.join(directory, 'trade_history_xau.csv')
+            file_path = os.path.join(base_path,directory, 'trade_history_xau.csv')
         elif self.symbol == "BTCUSDm":
-            file_path = os.path.join(directory, 'trade_history_btc.csv')
+            file_path = os.path.join(base_path,directory, 'trade_history_btc.csv')
         elif self.symbol == "USOILm":
-            file_path = os.path.join(directory, 'trade_history_usoil.csv')
+            file_path = os.path.join(base_path,directory, 'trade_history_usoil.csv')
         else:
             raise ValueError(f"Symbol {self.symbol} không được hỗ trợ!")
 
@@ -177,10 +186,10 @@ class LiveTradeMT5:
             recent_deal = max(symbol_deals, key=lambda d: d.time)
             print(f"Most recent deal for {symbol}:")
             print(f"usd: {recent_deal.profit}, Time: {datetime.fromtimestamp(recent_deal.time)}, Type: {recent_deal.type}, Volume: {recent_deal.volume}, Price: {recent_deal.price}")
-            return recent_deal.profit/(self.lot_size*3)
+            return recent_deal.profit/(self.lot_size*10)
             
         else:
-            print(f"No deals found for symbol {symbol} in the  {10} seconds.")
+            print(f"No deals found for symbol {symbol} in the  {3} seconds.")
             return 0
 
 
@@ -312,9 +321,9 @@ class LiveTradeMT5:
         self.observation_buffer = []
         
         profit=0
-        if self.pip < -10: 
+        if self.pip < 1: 
             self.win=-1        
-        elif self.pip>5:    
+        elif self.pip>1:    
             self.win=1
         profit=self.pip*(self.lot_size*10)
         self.balance+=profit
@@ -382,7 +391,6 @@ class LiveTradeMT5:
                     self.win_streak += 1  # Tăng chuỗi thắng
                     self.loss_streak = 0  # Reset chuỗi thua lỗ
                  self.close_order()
-                 print("hello")
                  self.position=0
                  self.pip=0
                  self.entry_price=0
@@ -411,7 +419,7 @@ def get_balance():
         return account_info.balance
 balance=get_balance()
 leverage=account_info.leverage
-model = PPO.load(r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\models\ppo_trading_xauusd.zip")
+model = PPO.load(r"models\ppo_trading_xauusd.zip")
 
 # Khởi tạo live trade
 live_trader = LiveTradeMT5(model,"XAUUSDm",balance,0.01,leverage)

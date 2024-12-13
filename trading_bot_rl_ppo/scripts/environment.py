@@ -31,7 +31,7 @@ class TradingEnv(gym.Env):
         # Cột quan sát
         self.obs_columns = ['Datetime_entry', "Mua/Ban", 'entry_price',
                             'ema10', 'ema20', 'ema50', 'rsi', 'macd_value', 'macd_signal', 'macd_hist',
-                            'volume', 'ADX', 'c_DI', 't_DI', 'Lot', 'Profit', 'win']
+                            'volume', 'ADX', 'c_DI', 't_DI','close', 'Lot', 'Profit', 'win']
         self.obs_entry = None
         self.win = 0
 
@@ -57,9 +57,16 @@ class TradingEnv(gym.Env):
         obs_entry_dict = {name: value for name, value in zip(self.obs_columns, self.obs_entry)}
 
         # Đường dẫn thư mục và file CSV
-        directory = r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\results\backtest"
-        file_path = os.path.join(directory, 'trade_history_xau.csv')
+        current_working_dir = os.getcwd()
+        index = current_working_dir.find("trading_bot_rl_ppo")
 
+        # Cắt chuỗi đến vị trí kết thúc của "trading_bot_rl_ppo"
+        if index != -1:
+            base_path = current_working_dir[:index + len("trading_bot_rl_ppo")]
+        else:
+            base_path = current_working_dir  # Nếu không tìm thấy, giữ nguyên
+        directory = r"results\backtest"
+        file_path = os.path.join(base_path,directory, 'trade_history_xau.csv')
         # Kiểm tra xem thư mục đã tồn tại chưa, nếu chưa thì tạo mới
         if not os.path.exists(directory):
             os.makedirs(directory)

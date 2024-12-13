@@ -71,7 +71,8 @@ def optimize_ppo(trial, data):
     return balance
 
 def train_data():
-    model_path = r"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\models\ppo_trading_xauusd.zip"
+    model_path = r"models\ppo_trading_xauusd.zip"
+    print(model_path)
     train_logger.info("Starting model training process.")
 
     # Kiểm tra mô hình đã tồn tại chưa
@@ -83,12 +84,13 @@ def train_data():
         model = PPO("MlpPolicy", DummyVecEnv([lambda: TradingEnv(pd.DataFrame(), render_mode='human')]), verbose=1)
 
     # Duyệt qua các tệp dữ liệu từ 2015
+    directory = r'data\processed\du_lieu_phan_tich'
     for year in range(2015, 2016):
         for month in range(1, 2):
             if month < 10:
-                file_path = f"C:\\Users\\nguye\\OneDrive\\documents\\python\\trading_bot_rl_ppo\\data\\processed\\du_lieu_phan_tich\\{year}\\du_lieu_vang_phan_tich_{year}_0{month}.csv"
+                file_path = os.path.join(directory, str(year),'du_lieu_vang_phan_tich_'+str(year)+'_0'+str(month)+'.csv')
             else:
-                file_path = f"C:\\Users\\nguye\\OneDrive\\documents\\python\\trading_bot_rl_ppo\\data\\processed\\du_lieu_phan_tich\\{year}\\du_lieu_vang_phan_tich_{year}_{month}.csv"
+                file_path = os.path.join(directory,str(year),'du_lieu_vang_phan_tich_'+str(year)+'_'+str(month)+'.csv')
 
             if os.path.exists(file_path):
                 train_logger.info(f"Loading data from {file_path}")

@@ -10,9 +10,9 @@ def add_column_names_and_save():
         for month in range(1, 2):
             # Xác định đường dẫn file từ thư mục mới
             if month < 10:
-                absolute_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_0{month}.csv"
+                absolute_path = rf"data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_0{month}.csv"
             else:
-                absolute_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_{month}.csv"
+                absolute_path = rf"data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_{month}.csv"
             
             # Kiểm tra sự tồn tại của file để tránh lỗi
             if os.path.exists(absolute_path):
@@ -103,11 +103,11 @@ def preprocess_data():
         for month in range(1, 2 ):
             # Đường dẫn file và file đầu ra
             if month < 10:
-                absolute_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_0{month}.csv"        
-                output_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\processed\du_lieu_phan_tich_{year}_0{month}.csv"
+                absolute_path = rf"data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_0{month}.csv"        
+                output_path = rf"data\processed\du_lieu_phan_tich_{year}_0{month}.csv"
             else:
-                absolute_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_{month}.csv"
-                output_path = rf"C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\processed\du_lieu_phan_tich_{year}_{month}.csv"
+                absolute_path = rf"data\raw\XAUUSD(2015-2024)\{year}\XAUUSD_{year}_{month}.csv"
+                output_path = rf"data\processed\du_lieu_phan_tich_{year}_{month}.csv"
             
             # Kiểm tra sự tồn tại của file
             if os.path.exists(absolute_path):

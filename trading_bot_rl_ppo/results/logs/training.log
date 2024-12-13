@@ -4,3 +4,29 @@
 2024-12-12 17:13:43,600 - training - INFO - Training on data with 95 timesteps.
 2024-12-12 17:13:47,921 - training - INFO - Training completed on C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
 2024-12-12 17:13:47,956 - training - INFO - Model saved at C:\Users\nguye\OneDrive\documents\python\trading_bot_rl_ppo\models\ppo_trading_xauusd.zip
+2024-12-13 09:13:56,444 - training - INFO - Starting model training process.
+2024-12-13 09:13:56,444 - training - INFO - No pre-trained model found. Initializing new model.
+2024-12-13 09:13:57,967 - training - WARNING - File not found: data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_\2015\_0\1\.csv
+2024-12-13 09:13:57,998 - training - INFO - Model saved at models\ppo_trading_xauusd.zip
+2024-12-13 09:15:47,543 - training - INFO - Starting model training process.
+2024-12-13 09:15:47,543 - training - INFO - No pre-trained model found. Initializing new model.
+2024-12-13 09:15:48,964 - training - WARNING - File not found: data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_\2015\_01\.csv
+2024-12-13 09:15:48,979 - training - INFO - Model saved at models\ppo_trading_xauusd.zip
+2024-12-13 09:16:55,880 - training - INFO - Starting model training process.
+2024-12-13 09:16:55,880 - training - INFO - No pre-trained model found. Initializing new model.
+2024-12-13 09:16:56,987 - training - INFO - Loading data from data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-13 09:16:57,149 - training - INFO - Training on data with 95 timesteps.
+2024-12-13 09:17:01,582 - training - INFO - Training completed on data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-13 09:17:01,610 - training - INFO - Model saved at models\ppo_trading_xauusd.zip
+2024-12-13 09:32:24,387 - training - INFO - Starting model training process.
+2024-12-13 09:32:24,387 - training - INFO - No pre-trained model found. Initializing new model.
+2024-12-13 09:32:26,117 - training - INFO - Loading data from data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-13 09:32:26,305 - training - INFO - Training on data with 95 timesteps.
+2024-12-13 09:32:31,371 - training - INFO - Training completed on data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-13 09:32:31,402 - training - INFO - Model saved at models\ppo_trading_xauusd.zip
+2024-12-13 09:35:04,653 - training - INFO - Starting model training process.
+2024-12-13 09:35:04,654 - training - INFO - No pre-trained model found. Initializing new model.
+2024-12-13 09:35:06,391 - training - INFO - Loading data from data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-13 09:35:06,530 - training - INFO - Training on data with 95 timesteps.
+2024-12-13 09:35:11,626 - training - INFO - Training completed on data\processed\du_lieu_phan_tich\2015\du_lieu_vang_phan_tich_2015_01.csv
+2024-12-13 09:35:11,674 - training - INFO - Model saved at models\ppo_trading_xauusd.zip
